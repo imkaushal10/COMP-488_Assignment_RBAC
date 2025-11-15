@@ -1617,5 +1617,5 @@ COMP-488_Assignment_RBAC/
 
 ## License
 
-Author: Kaushal Bhattarai
+Author: [Kaushal Bhattarai]
 This educational content is provided as-is for learning purposes.
