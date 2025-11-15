@@ -1,0 +1,33 @@
+---
+# ServiceAccount for automation tasks
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: automation-sa
+  namespace: default
+---
+# Role granting permissions to manage pods in the default namespace
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: automation-role
+  namespace: default
+rules:
+  - apiGroups: [""] # "" means core API group
+    resources: ["pods"] # This Role applies to pods
+    verbs: ["create", "delete", "get", "list"] # Allowed actions
+---
+# RoleBinding to attach the Role to the ServiceAccount
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: automation-binding
+  namespace: default
+subjects:
+  - kind: ServiceAccount
+    name: automation-sa
+    namespace: default
+roleRef:
+  kind: Role
+  name: automation-role
+  apiGroup: rbac.authorization.k8s.io

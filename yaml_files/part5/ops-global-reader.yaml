@@ -1,0 +1,23 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ops-global-reader
+rules:
+  # Read all resources cluster-wide
+  - apiGroups: ["", "apps", "batch", "networking.k8s.io", "storage.k8s.io"]
+    resources:
+      - pods
+      - deployments
+      - services
+      - nodes
+      - namespaces
+      - persistentvolumes
+      - persistentvolumeclaims
+      - ingresses
+      - events
+    verbs: ["get", "list", "watch"]
+
+  # Read cluster-level resources
+  - apiGroups: [""]
+    resources: ["nodes", "persistentvolumes"]
+    verbs: ["get", "list", "watch"]

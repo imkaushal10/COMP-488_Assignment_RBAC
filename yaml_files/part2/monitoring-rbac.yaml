@@ -1,0 +1,42 @@
+---
+# Service Account
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: monitoring-reader
+  namespace: monitoring
+---
+# Role with read-only permissions
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: monitoring-read-role
+  namespace: monitoring
+rules:
+  # Permission to read Pods
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["get", "list", "watch"]
+  # Permission to read Deployments
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "watch"]
+  # Permission to read ConfigMaps
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["get", "list", "watch"]
+---
+# RoleBinding to connect ServiceAccount to Role
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: monitoring-reader-binding
+  namespace: monitoring
+subjects:
+  - kind: ServiceAccount
+    name: monitoring-reader
+    namespace: monitoring
+roleRef:
+  kind: Role
+  name: monitoring-read-role
+  apiGroup: rbac.authorization.k8s.io

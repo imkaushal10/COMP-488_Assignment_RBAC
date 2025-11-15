@@ -1,0 +1,37 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-automation-label
+spec:
+  # Enforce = block requests that violate the policy
+  validationFailureAction: enforce
+
+  # Disable background mode so the policy only applies to NEW requests
+  background: false
+
+  rules:
+    - name: check-automation-label
+
+      # MATCH section defines WHO + WHAT this policy applies to
+      match:
+        # Match only requests made by the ServiceAccount automation-sa
+        subjects:
+          - kind: ServiceAccount
+            name: automation-sa
+            namespace: default
+
+        # Match only Pod resources (create/update/delete requests on Pods)
+        resources:
+          kinds:
+            - Pod
+
+      # VALIDATION section defines WHAT must be true
+      validate:
+        # Message returned when validation fails
+        message: "Pods created by automation-sa must have label 'managed-by: automation'"
+
+        # REQUIRED label pattern
+        pattern:
+          metadata:
+            labels:
+              managed-by: "automation"

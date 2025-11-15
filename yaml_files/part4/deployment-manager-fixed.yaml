@@ -1,0 +1,39 @@
+---
+# Service Account (no changes needed)
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: deployment-manager
+  namespace: production
+---
+# Role with CORRECTED API group
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: deployment-role
+  namespace: production
+rules:
+  # FIX #1: Changed apiGroups from [""] to ["apps"]
+  - apiGroups: ["apps"]
+    resources: ["deployments"]
+    verbs: ["get", "list", "create", "update", "delete"]
+  # Optional: Add deployment status and scale subresources
+  - apiGroups: ["apps"]
+    resources: ["deployments/status", "deployments/scale"]
+    verbs: ["get", "update"]
+---
+# RoleBinding with CORRECTED namespace
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: deployment-binding
+  # FIX #2: Changed namespace from "default" to "production"
+  namespace: production
+subjects:
+  - kind: ServiceAccount
+    name: deployment-manager
+    namespace: production
+roleRef:
+  kind: Role
+  name: deployment-role
+  apiGroup: rbac.authorization.k8s.io

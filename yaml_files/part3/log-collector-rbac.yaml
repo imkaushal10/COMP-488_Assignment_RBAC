@@ -1,0 +1,38 @@
+---
+# Service Account in default namespace
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: log-collector
+  namespace: default
+---
+# ClusterRole with cluster-wide read permissions
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: log-reader
+rules:
+  # Permission to read Pods in all namespaces
+  - apiGroups: [""]
+    resources: ["pods", "pods/log"]
+    verbs: ["get", "list", "watch"]
+  # Permission to read Nodes (cluster-scoped resource)
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list", "watch"]
+  # Explicitly NO access to secrets
+  # Secrets are not included in rules, so access is denied by default
+---
+# ClusterRoleBinding to grant cluster-wide permissions
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: log-collector-binding
+subjects:
+  - kind: ServiceAccount
+    name: log-collector
+    namespace: default
+roleRef:
+  kind: ClusterRole
+  name: log-reader
+  apiGroup: rbac.authorization.k8s.io
